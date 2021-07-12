@@ -1,0 +1,161 @@
+version: 2
+
+sources:
+  - name: staging
+    database: funbro
+    description: Data collected from imdb.com/interfaces
+    tables:
+      - name: name_basics
+        description: Contains the following information for staff (actors, directors, etc)
+        columns:
+         - name: nconst
+           description: (string) - alphanumeric unique identifier of the name/person
+           tests:
+             - unique
+             - not_null
+         - name: primaryName
+           description: (string)– name by which the person is most often credited
+           tests:
+             - not_null
+         - name: birthYear
+           description: in YYYY format
+         - name: deathYear
+           description: in YYYY format if applicable, else null
+         - name: primaryProfession
+           description: (array of strings)– the top-3 professions of the person
+           tests:
+             - not_null
+         - name: knownForTitles
+           description: (array of tconsts) – titles the person is known for
+      - name: title_akas
+        description: Contains the following information for titles (movie, tv show, etc titles)
+        columns:
+         - name: titleId
+           description: (string) - a tconst, an alphanumeric unique identifier of the title
+           tests:
+             - unique
+             - not_null
+         - name: ordering
+           description: (integer) – a number to uniquely identify rows for a given titleId
+           tests:
+             - not_null
+         - name: title
+           description: (string) – the localized title
+           tests:
+             - not_null
+         - name: region
+           description: (string) - the region for this version of the title
+         - name: language
+           description: (string) - the language of the title
+         - name: types
+           description: 'Enumerated list of attributes for this alternative title. New values may be added in the future without warning'
+         - name: attributes
+           description: (array) - Additional terms to describe this alternative title, not enumerated
+         - name: isOriginalTitle
+           description: "(boolean) – false: not original title; true: original title"
+           tests:
+             - accepted_values:
+                 values: [false, true]
+      - name: title_crew
+        description: Contains the director and writer information for all the titles in IMDb.
+        columns:
+         - name: tconst
+           description: alphanumeric unique identifier of the title
+           tests:
+             - unique
+             - not_null
+         - name: directors
+           description: (array of nconsts) - director(s) of the given title
+         - name: writers
+           description: (array of nconsts) – writer(s) of the given title
+      - name: title_episode
+        description: Contains the tv episode information.
+        columns:
+         - name: tconst
+           description: alphanumeric identifier of episode
+           tests:
+             - unique
+             - not_null
+         - name: parentTconst
+           description: (string) - alphanumeric identifier of the parent TV Series
+           tests:
+             - not_null
+         - name: seasonNumber
+           description: (integer) – season number the episode belongs to
+         - name: episodeNumber
+           description: (integer) – episode number of the tconst in the TV series
+      - name: title_principals
+        description: Contains the tv episode information.
+        columns:
+         - name: tconst
+           description: alphanumeric unique identifier of the title
+           tests:
+             - not_null
+         - name: ordering
+           description: (integer) – a number to uniquely identify rows for a given titleId
+           tests:
+             - not_null
+         - name: nconst
+           description: alphanumeric unique identifier of the name/person
+           tests:
+             - not_null
+         - name: category
+           description: (string) - the category of job that person was in
+           tests:
+             - not_null
+         - name: job
+           description: (string) - the specific job title if applicable, else null
+         - name: characters
+           description: (string) - the name of the character played if applicable, else null
+      - name: title_ratings
+        description: Contains the IMDb rating and votes information for titles
+        columns:
+         - name: tconst
+           description: alphanumeric unique identifier of the title
+           tests:
+             - unique
+             - not_null
+         - name: averageRating
+           description: weighted average of all the individual user ratings
+           tests:
+             - not_null
+         - name: numVotes
+           description: number of votes the title has received
+           tests:
+             - not_null
+      - name: title_basics
+        description: Contains the following information for titles
+        columns:
+         - name: tconst
+           description: (string) - alphanumeric unique identifier of the title
+           tests:
+             - unique
+             - not_null
+         - name: titleType
+           description: (string) – the type/format of the title (e.g. movie, short, tvseries, tvepisode, video, etc)
+           tests:
+             - not_null
+             - accepted_values:
+                 values: ['radioSeries', 'video', 'tvSpecial', 'tvSeries', 'tvShort', 'movie', 'tvMovie', 'short', 'tvMiniSeries', 'radioEpisode', 'videoGame', 'tvEpisode']
+         - name: primaryTitle
+           description: (string) – the more popular title / the title used by the filmmakers on promotional materials at the point of release
+           tests:
+             - not_null
+         - name: originalTitle
+           description: (string) - original title, in the original language
+           tests:
+             - not_null
+         - name: isAdult
+           description: "(boolean) - 0: non-adult title; 1: adult title"
+           tests:
+             - not_null
+             - accepted_values:
+                 values: [false, true]
+         - name: startYear
+           description: (YYYY) – represents the release year of a title. In the case of TV Series, it is the series start year
+         - name: endYear
+           description: (YYYY) – TV Series end year. ‘\N’ for all other title types
+         - name: runtimeMinutes
+           description: – primary runtime of the title, in minutes
+         - name: genres
+           description: (string array) – includes up to three genres associated with the title
