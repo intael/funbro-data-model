@@ -1,0 +1,25 @@
+funbro:
+  target: dev
+  outputs:
+    dev:
+      type: postgres
+      host: 
+      user: 
+      password: 
+      port: 5432
+      dbname: funbro
+      schema: imdb_dev
+      threads: 10
+      keepalives_idle: 0 # default 0, indicating the system default
+      sslmode: require
+    prod:
+      type: postgres
+      host: 
+      user: 
+      password: 
+      port: 5432
+      dbname: funbro
+      schema: imdb
+      threads: 10
+      keepalives_idle: 0 # default 0, indicating the system default
+      sslmode: require
