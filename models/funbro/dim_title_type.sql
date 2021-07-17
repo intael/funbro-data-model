@@ -16,7 +16,10 @@ SELECT
       ['titletype']
     ) }}::UUID as id,
     titletype AS title_type
-FROM title_types
-WHERE {{ dbt_utils.surrogate_key(
-      ['titletype']
-    ) }}::UUID NOT IN (SELECT id FROM {{ this }}) 
+FROM title_types tt
+LEFT JOIN
+    {{ this }} t
+ON t.id = {{ dbt_utils.surrogate_key(
+      ['tt.titletype']
+    ) }}::UUID
+WHERE t.id IS NULL

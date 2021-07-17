@@ -21,14 +21,19 @@ title_ids_and_genre_ids AS
         titles_with_genres t
     LEFT JOIN
         {{ ref("dim_genre")}} g
-    using ( genre )
+    USING ( genre )
     LEFT JOIN
         {{ ref("dim_title")}} tt
-    ON t.tconst = tt.tconst
+    ON tt.id = {{ dbt_utils.surrogate_key(
+      ['t.tconst']
+    ) }}::UUID
 )
 
 SELECT
-     title_id, genre_id
+     st.title_id, st.genre_id
 FROM
-    title_ids_and_genre_ids
-WHERE (title_id, genre_id) NOT IN (SELECT title_id, genre_id FROM {{ this }}) 
+    title_ids_and_genre_ids st
+LEFT JOIN
+    {{ this }} tg
+ON tg.title_id = st.title_id AND tg.genre_id = st.genre_id
+WHERE tg.title_id IS NULL

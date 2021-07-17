@@ -6,9 +6,9 @@
 
 SELECT
     {{ dbt_utils.surrogate_key(
-      ['tconst']
+      ['tb.tconst']
     ) }}::UUID AS id,
-    tconst,
+    tb.tconst,
     tt.id AS title_type_id,
     tb.primarytitle AS primary_title,
     tb.originaltitle AS original_title,
@@ -19,8 +19,13 @@ SELECT
 FROM
     {{ source("staging", "title_basics")}} tb
 LEFT JOIN
-    {{ ref("dim_title_type")}} tt ON tt.title_type = tb.titleType
+    {{ ref("dim_title_type")}} tt ON tt.id = {{ dbt_utils.surrogate_key(
+      ['tb.titletype']
+    ) }}::UUID
+LEFT JOIN
+    {{ this }} dim ON dim.id = {{ dbt_utils.surrogate_key(
+      ['tb.tconst']
+    ) }}::UUID
 
-WHERE {{ dbt_utils.surrogate_key(
-      ['tconst']
-    ) }}::UUID NOT IN (select id from {{ this }})
+WHERE
+    dim.id IS NULL

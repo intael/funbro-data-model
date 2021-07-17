@@ -13,10 +13,14 @@ WITH genres AS
 
 SELECT
      {{ dbt_utils.surrogate_key(
-      ['genre']
+      ['g.genre']
     ) }}::UUID as id,
-    genre
-FROM genres
-WHERE {{ dbt_utils.surrogate_key(
-      ['genre']
-    ) }}::UUID NOT IN (SELECT id FROM {{ this }}) 
+    g.genre
+FROM
+    genres g
+LEFT JOIN
+    {{ this }} ge
+ON ge.id = {{ dbt_utils.surrogate_key(
+      ['g.genre']
+    ) }}::UUID
+WHERE ge.id IS NULL
